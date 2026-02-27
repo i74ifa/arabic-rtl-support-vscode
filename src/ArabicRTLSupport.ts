@@ -1,8 +1,45 @@
 import * as ts from "typescript";
-import { TextDocument } from "vscode";
+import * as vscode from "vscode";
 
 export default class ArabicRTLSupport {
-  constructor() {}
+  private decorationType!: vscode.TextEditorDecorationType;
+
+  constructor() {
+    this.updateDecorationType();
+  }
+
+  public updateDecorationType(): void {
+    if (this.decorationType) {
+      this.decorationType.dispose();
+    }
+
+    const config = vscode.workspace.getConfiguration("arabicRtlSupport");
+    const enableBackground = config.get<boolean>("enableBackground", true);
+    const backgroundColor = config.get<string>("backgroundColor", "#ffffff");
+    const backgroundOpacity = config.get<number>("backgroundOpacity", 0.05);
+    const textColor = config.get<string>("textColor", "");
+
+    let bgColor = "transparent";
+    if (enableBackground) {
+      const hexMatch = backgroundColor.match(
+        /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i,
+      );
+      if (hexMatch) {
+        const r = parseInt(hexMatch[1], 16);
+        const g = parseInt(hexMatch[2], 16);
+        const b = parseInt(hexMatch[3], 16);
+        bgColor = `rgba(${r}, ${g}, ${b}, ${backgroundOpacity})`;
+      } else {
+        bgColor = backgroundColor;
+      }
+    }
+
+    this.decorationType = vscode.window.createTextEditorDecorationType({
+      backgroundColor: enableBackground ? bgColor : undefined,
+      color: textColor ? textColor : undefined,
+      textDecoration: "none; direction: rtl; unicode-bidi: isolate;",
+    });
+  }
 
   /**
    * Checks if the given text contains any Arabic characters.
@@ -35,7 +72,12 @@ export default class ArabicRTLSupport {
     return matches.map((match) => match.slice(1, -1));
   }
 
-  public findStrings(document: TextDocument): { text: string; line: number }[] {
+  /**
+   * Finds Arabic strings in the document and returns their text and line numbers.
+   */
+  public findStrings(
+    document: vscode.TextDocument,
+  ): { text: string; line: number }[] {
     const sourceFile = ts.createSourceFile(
       "file.ts",
       document.getText(),
@@ -62,5 +104,39 @@ export default class ArabicRTLSupport {
     visit(sourceFile);
 
     return results;
+  }
+
+  /**
+   * Decorates Arabic text in the editor.
+   */
+  public decorateArabicText(editor: vscode.TextEditor): void {
+    const document = editor.document;
+    const sourceFile = ts.createSourceFile(
+      "file.ts",
+      document.getText(),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+
+    const ranges: vscode.Range[] = [];
+
+    const visit = (node: ts.Node) => {
+      if (
+        ts.isStringLiteral(node) ||
+        ts.isNoSubstitutionTemplateLiteral(node)
+      ) {
+        if (this.isArabicText(node.text)) {
+          const startPos = document.positionAt(node.getStart());
+          const endPos = document.positionAt(node.getEnd());
+          ranges.push(new vscode.Range(startPos, endPos));
+        }
+      }
+
+      ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
+
+    editor.setDecorations(this.decorationType, ranges);
   }
 }

@@ -14,7 +14,34 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": []
+    "commands": [],
+    "configuration": {
+      "title": "Arabic RTL Support",
+      "properties": {
+        "arabicRtlSupport.enableBackground": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable background for Arabic text."
+        },
+        "arabicRtlSupport.backgroundColor": {
+          "type": "string",
+          "default": "#ffffff",
+          "description": "Background color for Arabic text (e.g., '#ffffff' or 'rgb(255, 255, 255)')."
+        },
+        "arabicRtlSupport.backgroundOpacity": {
+          "type": "number",
+          "default": 0.05,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity of the background (0 to 1)."
+        },
+        "arabicRtlSupport.textColor": {
+          "type": "string",
+          "default": "",
+          "description": "Text color code for Arabic text (e.g., '#ff0000'). Leave empty to use default text color."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
