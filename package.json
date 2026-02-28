@@ -3,6 +3,11 @@
   "displayName": "Arabic RTL Support",
   "description": "",
   "version": "0.0.1",
+  "author": {
+    "email": "i74ifa@icloud.com",
+    "name": "Hothaifa Jaber",
+    "url": "https://i74ifa.com"
+  },
   "engines": {
     "vscode": "^1.000.0"
   },

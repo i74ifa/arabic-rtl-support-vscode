@@ -1,71 +1,103 @@
-# arabic-rtl-support README
+# دعم النصوص العربية RTL
 
-This is the README for your extension "arabic-rtl-support". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+> إضافة لـ Visual Studio Code تكتشف النصوص العربية في كودك تلقائيًا وتعرضها بشكل صحيح من **اليمين إلى اليسار (RTL)** — حتى تقرأ نصوصك العربية بشكل طبيعي مباشرة داخل المحرر.
 
 ---
 
-## Following extension guidelines
+## ✨ المميزات
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### 🔍 كشف تلقائي للنصوص العربية
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+تقوم الإضافة بفحص ملفات TypeScript/JavaScript في الوقت الفعلي باستخدام محلل AST. أي نص يحتوي على حروف عربية يتم اكتشافه وتزيينه فورًا — بدون أي إعداد يدوي.
 
-## Working with Markdown
+### ↔️ عرض النص من اليمين لليسار
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+يتم تطبيق `direction: rtl; unicode-bidi: isolate;` على النصوص العربية، مما يجعلها تُعرض من اليمين لليسار
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+### 🎨 تخصيص المظهر
 
-## For more information
+يمكنك تمييز النصوص العربية بلون خلفية وشفافية قابلَين للضبط. كما يمكنك تغيير لون النص بشكل مستقل.
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+---
 
-**Enjoy!**
+## 📸 معاينة
+
+**قبل**
+
+![قبل الإضافة](assets/example-before.png)
+
+**بعد**
+
+![بعد الإضافة](assets/example-after.png)
+
+---
+
+## ⚙️ إعدادات الإضافة
+
+يمكنك تخصيص الإضافة عبر **إعدادات VS Code** (`Cmd+,` على macOS أو `Ctrl+,` على Windows/Linux)، ثم ابحث عن **"Arabic RTL Support"**.
+
+| الإعداد                              | النوع     | القيمة الافتراضية | الوصف                                                           |
+| ------------------------------------ | --------- | ----------------- | --------------------------------------------------------------- |
+| `arabicRtlSupport.enableBackground`  | `boolean` | `true`            | تفعيل أو تعطيل الخلفية على النصوص العربية                       |
+| `arabicRtlSupport.backgroundColor`   | `string`  | `#ffffff`         | لون الخلفية للنصوص العربية (hex أو rgb)                         |
+| `arabicRtlSupport.backgroundOpacity` | `number`  | `0.05`            | شفافية الخلفية من `0` (شفاف) إلى `1` (معتم)                     |
+| `arabicRtlSupport.textColor`         | `string`  | `""`              | لون مخصص للنص العربي. اتركه فارغًا لاستخدام لون الثيم الافتراضي |
+
+### مثال على `settings.json`
+
+```json
+{
+  "arabicRtlSupport.enableBackground": true,
+  "arabicRtlSupport.backgroundColor": "#1e90ff",
+  "arabicRtlSupport.backgroundOpacity": 0.1,
+  "arabicRtlSupport.textColor": ""
+}
+```
+
+---
+
+## 🚀 كيف تعمل الإضافة؟
+
+1. **عند الفتح** — تقوم الإضافة بتزيين النصوص العربية في المحرر النشط فورًا.
+2. **عند تبديل التبويب** — الانتقال لملف جديد يُشغّل الكشف تلقائيًا.
+3. **أثناء الكتابة** — عند كتابة أو تعديل الكود، يتم الكشف عن النصوص العربية وتمييزها لحظيًا.
+4. **عند تغيير الإعدادات** — أي تغيير في إعدادات `arabicRtlSupport.*` يُطبَّق فورًا بدون إعادة تشغيل.
+
+تعتمد الإضافة على **TypeScript Compiler API** لتحليل الملفات كـ AST واستخراج النصوص الحرفية فقط — مما يضمن عدم التأثير على التعليقات أو أسماء المتغيرات أو الكلمات المحجوزة.
+
+---
+
+## 📦 المتطلبات
+
+- **VS Code** `^1.0.0`
+- لا توجد متطلبات إضافية — الإضافة تعمل مباشرة بعد التثبيت.
+
+---
+
+## 🐛 المشاكل المعروفة
+
+- تدعم الإضافة حاليًا ملفات **TypeScript و JavaScript** فقط (تحليل AST).
+- الملفات الكبيرة جدًا ذات النصوص العربية الكثيرة قد تشهد تأخيرًا طفيفًا في التزيين.
+
+---
+
+## 📋 سجل الإصدارات
+
+### 0.0.1
+
+- الإصدار الأول
+- كشف تلقائي للنصوص العربية باستخدام TypeScript AST
+- عرض RTL مع `unicode-bidi: isolate`
+- تخصيص لون الخلفية والشفافية ولون النص
+- تحديث فوري عند الكتابة وعند تغيير الإعدادات
+- دعم خط IBM Plex Sans Arabic
+
+---
+
+## 🤝 المساهمة
+
+نرحب بطلبات السحب والمشاكل المبلغ عنها! لا تتردد في فتح نقاش إذا كان لديك أفكار لدعم أنواع ملفات أخرى أو ميزات عربية إضافية.
+
+---
+
+**استمتع بكتابة الكود العربي بالطريقة الصحيحة! 🇸🇦**
