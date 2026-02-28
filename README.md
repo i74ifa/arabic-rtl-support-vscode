@@ -1,10 +1,20 @@
 ![قبل الإضافة](assets/banner.jpg)
 
-# دعم النصوص العربية RTL
+# Arabic RTL Support
 
 > إضافة لـ Visual Studio Code تكتشف النصوص العربية في كودك تلقائيًا وتعرضها بشكل صحيح من **اليمين إلى اليسار (RTL)** — حتى تقرأ نصوصك العربية بشكل طبيعي مباشرة داخل المحرر.
 
 ---
+
+## تبثيت
+
+<!-- i74ifa.arabic-rtl-support -->
+
+```bash
+
+ext install i74ifa.arabic-rtl-support
+
+```
 
 ## ✨ المميزات
 
