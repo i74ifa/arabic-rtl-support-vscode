@@ -1,12 +1,18 @@
 {
   "name": "arabic-rtl-support",
   "displayName": "Arabic RTL Support",
-  "description": "",
+  "description": "Adds RTL (Right-to-Left) support and styling for Arabic text in VS Code.",
   "version": "0.0.1",
   "author": {
     "email": "i74ifa@icloud.com",
     "name": "Hothaifa Jaber",
     "url": "https://i74ifa.com"
+  },
+  "publisher": "Hothaifa Jaber",
+  "repository": {
+    "url": "https://github.com/i74ifa/arabic-rtl-support-vscode",
+    "directory": "/",
+    "type": "git"
   },
   "engines": {
     "vscode": "^1.000.0"
