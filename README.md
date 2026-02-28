@@ -8,7 +8,9 @@
 
 ## تبثيت
 
-<!-- i74ifa.arabic-rtl-support -->
+<!-- keyboard shortcut -->
+
+اضغط `Ctrl+Shift+P` ثم اكتب `Install Extension` أو `Cmd+Shift+P` على macOS
 
 ```bash
 
