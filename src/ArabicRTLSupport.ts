@@ -1,4 +1,3 @@
-import * as ts from "typescript";
 import * as vscode from "vscode";
 
 export default class ArabicRTLSupport {
@@ -42,9 +41,7 @@ export default class ArabicRTLSupport {
   }
 
   /**
-   * Checks if the given text contains any Arabic characters.
-   * @param text The text to check.
-   * @returns boolean True if the text contains Arabic characters, false otherwise.
+   * للتحقق من وجود أحرف عربية
    */
   public isArabicText(text: string): boolean {
     const arabicRegex =
@@ -53,89 +50,27 @@ export default class ArabicRTLSupport {
   }
 
   /**
-   * Extracts text strings enclosed in quotes (single, double, or backticks) from a given string/code.
-   * For example, given 'print("this is text")', it will return ['this is text'].
-   * @param code The code containing text literals.
-   * @returns string[] An array of extracted text strings without the surrounding quotes.
-   */
-  public extractTextFromCode(code: string): string[] {
-    // Matches sequences inside double quotes, single quotes, or backticks, ignoring escaped quotes
-    const stringLiteralRegex =
-      /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`/g;
-    const matches = code.match(stringLiteralRegex);
-
-    if (!matches) {
-      return [];
-    }
-
-    // Remove the surrounding quotes from each match and return the inner text
-    return matches.map((match) => match.slice(1, -1));
-  }
-
-  /**
-   * Finds Arabic strings in the document and returns their text and line numbers.
-   */
-  public findStrings(
-    document: vscode.TextDocument,
-  ): { text: string; line: number }[] {
-    const sourceFile = ts.createSourceFile(
-      "file.ts",
-      document.getText(),
-      ts.ScriptTarget.Latest,
-      true,
-    );
-
-    const results: { text: string; line: number }[] = [];
-
-    const visit = (node: ts.Node) => {
-      if (
-        ts.isStringLiteral(node) ||
-        ts.isNoSubstitutionTemplateLiteral(node)
-      ) {
-        if (this.isArabicText(node.text)) {
-          const line = document.positionAt(node.getStart()).line;
-          results.push({ text: node.text, line });
-        }
-      }
-
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
-
-    return results;
-  }
-
-  /**
-   * Decorates Arabic text in the editor.
+   * معالجة النصوص العربية داخل الاقتباسات وتطبيق التنسيق
    */
   public decorateArabicText(editor: vscode.TextEditor): void {
-    const document = editor.document;
-    const sourceFile = ts.createSourceFile(
-      "file.ts",
-      document.getText(),
-      ts.ScriptTarget.Latest,
-      true,
-    );
-
+    const text = editor.document.getText();
     const ranges: vscode.Range[] = [];
 
-    const visit = (node: ts.Node) => {
-      if (
-        ts.isStringLiteral(node) ||
-        ts.isNoSubstitutionTemplateLiteral(node)
-      ) {
-        if (this.isArabicText(node.text)) {
-          const startPos = document.positionAt(node.getStart());
-          const endPos = document.positionAt(node.getEnd());
-          ranges.push(new vscode.Range(startPos, endPos));
-        }
+    // ريجيكس للبحث عن النصوص بين " " أو ' ' أو ` ` مع دعم الـ Escaping
+    const stringRegex =
+      /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`/g;
+
+    let match;
+    while ((match = stringRegex.exec(text)) !== null) {
+      // نتحقق إذا كان النص داخل الاقتباس يحتوي على أحرف عربية
+      if (this.isArabicText(match[0])) {
+        const startPos = editor.document.positionAt(match.index);
+        const endPos = editor.document.positionAt(
+          match.index + match[0].length,
+        );
+        ranges.push(new vscode.Range(startPos, endPos));
       }
-
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
+    }
 
     editor.setDecorations(this.decorationType, ranges);
   }

@@ -10,6 +10,7 @@ suite("ArabicRTLSupport Test Suite", () => {
 
   const support = new ArabicRTLSupport();
 
+  // ─── isArabicText ────────────────────────────────────────────────────────────
   suite("isArabicText", () => {
     test("should return true for purely Arabic text", () => {
       assert.strictEqual(support.isArabicText("مرحبا"), true);
@@ -30,50 +31,33 @@ suite("ArabicRTLSupport Test Suite", () => {
       assert.strictEqual(support.isArabicText("123456"), false);
       assert.strictEqual(support.isArabicText("!@#$%^&*()"), false);
     });
+
+    test("should return false for an empty string", () => {
+      assert.strictEqual(support.isArabicText(""), false);
+    });
+
+    test("should return true for Arabic text in extended Unicode ranges", () => {
+      // U+0750–U+077F: Arabic Supplement
+      assert.strictEqual(support.isArabicText("\u0750"), true);
+      // U+FB50–U+FDFF: Arabic Presentation Forms-A
+      assert.strictEqual(support.isArabicText("\uFB50"), true);
+      // U+FE70–U+FEFF: Arabic Presentation Forms-B
+      assert.strictEqual(support.isArabicText("\uFE70"), true);
+    });
   });
 
-  suite("extractTextFromCode", () => {
-    test("should extract text from double quotes", () => {
-      const result = support.extractTextFromCode('print("hello world")');
-      assert.deepStrictEqual(result, ["hello world"]);
+  // ─── updateDecorationType ────────────────────────────────────────────────────
+  suite("updateDecorationType", () => {
+    test("should not throw when called without a previous decoration", () => {
+      const fresh = new ArabicRTLSupport();
+      assert.doesNotThrow(() => fresh.updateDecorationType());
     });
 
-    test("should extract text from single quotes", () => {
-      const result = support.extractTextFromCode("let a = 'some text';");
-      assert.deepStrictEqual(result, ["some text"]);
-    });
-
-    test("should extract text from backticks", () => {
-      const result = support.extractTextFromCode(
-        "console.log(`template literal`);",
-      );
-      assert.deepStrictEqual(result, ["template literal"]);
-    });
-
-    test("should extract multiple string literals from code", () => {
-      const result = support.extractTextFromCode(
-        "print(\"hello\"); const s = 'world';",
-      );
-      assert.deepStrictEqual(result, ["hello", "world"]);
-    });
-
-    test("should handle empty strings correctly", () => {
-      const result = support.extractTextFromCode('let empty = "";');
-      assert.deepStrictEqual(result, [""]);
-    });
-
-    test("should return an empty array if no text is found", () => {
-      const result = support.extractTextFromCode(
-        "const a = 1; const b = 2; return a + b;",
-      );
-      assert.deepStrictEqual(result, []);
-    });
-
-    test("should handle escaped quotes inside strings", () => {
-      const result = support.extractTextFromCode(
-        'const str = "escaping \\" inside";',
-      );
-      assert.deepStrictEqual(result, ['escaping \\" inside']);
+    test("should not throw when called multiple times (disposes previous type)", () => {
+      assert.doesNotThrow(() => {
+        support.updateDecorationType();
+        support.updateDecorationType();
+      });
     });
   });
 });
