@@ -26,7 +26,19 @@
   "icon": "./assets/logo.png",
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [],
+    "commands": [
+      {
+        "command": "arabicRtlSupport.searchArabicInWorkspace",
+        "title": "Search Arabic Text in Workspace",
+        "category": "Arabic RTL Support"
+      },
+      {
+        "command": "arabicRtlSupport.searchArabicInActiveFile",
+        "title": "Search Arabic Text in Active File",
+        "category": "Arabic RTL Support",
+        "enablement": "editorIsOpen"
+      }
+    ],
     "configuration": {
       "title": "Arabic RTL Support",
       "properties": {

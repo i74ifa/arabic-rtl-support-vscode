@@ -56,18 +56,21 @@ export default class ArabicRTLSupport {
     const text = editor.document.getText();
     const ranges: vscode.Range[] = [];
 
-    // ريجيكس للبحث عن النصوص بين " " أو ' ' أو ` ` مع دعم الـ Escaping
+    // ريجيكس للبحث عن النصوص بين " " أو ' ' أو ` ` مع دعم الـ Escaping.
+    // المجموعة الملتقطة هي المحتوى الداخلي فقط (بدون علامات الاقتباس).
     const stringRegex =
-      /"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`/g;
+      /"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'|`((?:\\.|[^`\\])*)`/g;
 
     let match;
     while ((match = stringRegex.exec(text)) !== null) {
+      // المحتوى الداخلي فقط — أيّ مجموعة التقطت (مزدوجة/مفردة/خلفية)
+      const inner = match[1] ?? match[2] ?? match[3] ?? "";
       // نتحقق إذا كان النص داخل الاقتباس يحتوي على أحرف عربية
-      if (this.isArabicText(match[0])) {
-        const startPos = editor.document.positionAt(match.index);
-        const endPos = editor.document.positionAt(
-          match.index + match[0].length,
-        );
+      if (inner.length > 0 && this.isArabicText(inner)) {
+        // نتجاوز علامة الاقتباس الافتتاحية حتى لا تُنسّق الاقتباسات نفسها
+        const innerStart = match.index + 1;
+        const startPos = editor.document.positionAt(innerStart);
+        const endPos = editor.document.positionAt(innerStart + inner.length);
         ranges.push(new vscode.Range(startPos, endPos));
       }
     }
